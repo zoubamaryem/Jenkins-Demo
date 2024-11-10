@@ -1,27 +1,44 @@
-node {
-    def mvnHome = tool 'maven-3.5.2'
-    def dockerImage
-    def dockerImageTag = "devopsexample${env.BUILD_NUMBER}"
+pipeline {
+    agent any
+
+    // tools {
+    //     // Install the Maven version configured as "M3" and add it to the path.
+    //     maven "M3"
+    // }
+
+    stages {
+        stage('Clone Repo') {
+            steps {
+                // Get some code from a GitHub repository
+                git 'https://github.com/wahid007/Jenkins-Demo'
+            }
+
+        }
+        
+        stage('Build App') {
+            steps {
+                // Run Maven on a Unix agent.
+                sh "mvn -Dmaven.test.failure.ignore=true clean package"
+            }
+
+        }
+        
+        stage('Build image') {
+          steps{
+            script {
+            //   dockerImage = docker.build dockerimagename
+                echo "devopsexample-${env.BUILD_NUMBER}"
+            }
+          }
+        }        
+    }
     
-    stage('Clone Repo') {
-      git 'https://github.com/rhmanou/Jenkins-Test.git'
+    post {
+        success {
+            echo 'Pipeline execution successful!'
+        }
+        failure {
+            echo 'Pipeline execution failed.'
+        }
     }    
-  
-    stage('Build Project') {
-      sh "'${mvnHome}/bin/mvn' -B -DskipTests clean package"
-    }
-    
-    stage('Initialize Docker'){         
-	  def dockerHome = tool 'MyDocker'         
-	  env.PATH = "${dockerHome}/bin:${env.PATH}"     
-    }
-    
-    stage('Build Docker Image') {
-      sh "docker -H tcp://192.168.8.100:2375 build -t devopsexample:${env.BUILD_NUMBER} ."
-    }
-    
-    stage('Deploy Docker Image'){
-      	echo "Docker Image Tag Name: ${dockerImageTag}"
-	sh "docker -H tcp://192.168.8.100:2375 run --name devopsexample -d -p 2222:2222 devopsexample:${env.BUILD_NUMBER}"
-    }
 }
