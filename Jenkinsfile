@@ -12,14 +12,15 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repo') {
-            steps {
-                // Get some code from a GitHub repository
-                git branch: 'main', url: 'https://github.com/wahid007/Jenkins-Demo.git'
-                // git 'https://github.com/wahid007/Jenkins-Demo'
-            }
+        // For Pipeline script
+        // stage('Clone Repo') {
+        //     steps {
+        //         // Get some code from a GitHub repository
+        //         git branch: 'main', url: 'https://github.com/wahid007/Jenkins-Demo.git'
+        //         // git 'https://github.com/wahid007/Jenkins-Demo'
+        //     }
 
-        }
+        // }
         
         stage('Build App') {
             steps {
