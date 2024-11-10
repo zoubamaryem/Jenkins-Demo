@@ -6,11 +6,17 @@ pipeline {
     //     maven "M3"
     // }
 
+    // Poll every 5 minutes, if there is a new code Jenkins will run the job
+    triggers {
+        pollSCM('*/5 * * * *')
+    }
+
     stages {
         stage('Clone Repo') {
             steps {
                 // Get some code from a GitHub repository
-                git 'https://github.com/wahid007/Jenkins-Demo.git'
+                git branch: 'main', url: 'https://github.com/wahid007/Jenkins-Demo.git'
+                // git 'https://github.com/wahid007/Jenkins-Demo'
             }
 
         }
@@ -27,7 +33,7 @@ pipeline {
           steps{
             script {
             //   dockerImage = docker.build dockerimagename
-                echo "devopsexample-${env.BUILD_NUMBER}"
+                echo "demo-jenkins-${env.BUILD_NUMBER}"
             }
           }
         }        
