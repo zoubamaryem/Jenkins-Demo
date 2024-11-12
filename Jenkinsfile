@@ -35,7 +35,7 @@ pipeline {
             script {
             //   dockerImage = docker.build dockerimagename
                 echo "demo-jenkins-${env.BUILD_NUMBER}"
-                // docker.build demo-jenkins-${env.BUILD_NUMBER}
+                docker.build demo-jenkins-${env.BUILD_NUMBER}
             }
           }
         }        
