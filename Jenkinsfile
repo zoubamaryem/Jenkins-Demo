@@ -36,11 +36,21 @@ pipeline {
             //   dockerImage = docker.build dockerimagename
                 echo "demo-jenkins-${env.BUILD_NUMBER}"
                 // docker.build demo-jenkins-${env.BUILD_NUMBER}
-                // sh "docker rmi wahid007/jenkins_demo"
+                sh "docker rmi wahid007/jenkins_demo"
                 sh "docker build -t wahid007/jenkins_demo ."
             }
           }
-        }        
+        }     
+
+        stage('Run Docker Container') {
+          steps{
+            script {
+                // delete container if exists
+                sh "docker rm -f myContainerName"
+                sh "docker run -d --name myContainerName -p 2222:2222 wahid007/jenkins_demo"
+            }
+          }
+        }          
     }
     
     post {
