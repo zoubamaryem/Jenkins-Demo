@@ -43,15 +43,15 @@ pipeline {
           }
         }     
 
-        // stage('Run Docker Container') {
-        //   steps{
-        //     script {
-        //         // delete container if exists
-        //         sh "docker rm -f myContainerName"
-        //         sh "docker run -d --name myContainerName -p 2222:2222 wahid007/jenkins_demo"
-        //     }
-        //   }
-        // }          
+        stage('Run Docker Container') {
+          steps{
+            script {
+                // delete container if exists
+                sh "docker rm -f myContainerName"
+                sh "docker run -d --name myContainerName -p 2222:2222 wahid007/jenkins_demo"
+            }
+          }
+        }          
     }
     
     post {
