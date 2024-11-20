@@ -36,6 +36,8 @@ pipeline {
             //   dockerImage = docker.build dockerimagename
                 echo "demo-jenkins-${env.BUILD_NUMBER}"
                 // docker.build demo-jenkins-${env.BUILD_NUMBER}
+                // sh "docker rmi wahid007/jenkins_demo"
+                sh "docker build -t wahid007/jenkins_demo ."
             }
           }
         }        
