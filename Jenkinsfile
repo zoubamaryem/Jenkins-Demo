@@ -1,8 +1,17 @@
 pipeline {
     agent any
 
-    def dockerImage
-    def dockerImageTag = "wahid007/demo-jenkins${env.BUILD_NUMBER}"
+    environment {
+        // The MY_KUBECONFIG environment variable will be assigned
+        // the value of a temporary file.  For example:
+        //   /home/user/.jenkins/workspace/cred_test@tmp/secretFiles/546a5cf3-9b56-4165-a0fd-19e2afe6b31f/kubeconfig.txt
+        // MY_KUBECONFIG = credentials('my-kubeconfig')
+        registry = "wahid007/demo-jenkins"
+        registryCredential = 'dockerhub_id'
+        dockerImage = ''        
+    }
+
+
     // tools {
     //     // Install the Maven version configured as "M3" and add it to the path.
     //     maven "M3"
@@ -33,33 +42,37 @@ pipeline {
         
         stage('Build image') {
           steps{
-            script {
-              // echo "demo-jenkins-${env.BUILD_NUMBER}"
-              // docker.build demo-jenkins-${env.BUILD_NUMBER}
-              //   dockerImage = docker.build dockerimagename
-              echo "Docker Image Tag Name: ${dockerImageTag}"
-              sh "docker build -t ${dockerImageTag} ."
-              // dockerImage = docker.build("${dockerImageTag}")                
-            }
+              echo "Docker Image Tag Name: $registry:$BUILD_NUMBER"
+              sh "docker build -t $registry:$BUILD_NUMBER ."
+              // script {
+              //   dockerImage = docker.build registry + ":$BUILD_NUMBER"   
+              // }          
           }
         }       
 
         stage('Deploy Docker Image'){
           steps {
-            script {
-              sh "docker run --name demo-jenkins -d -p 2222:2222 ${dockerImageTag}"
-            }
+            sh "docker run --name demo-jenkins -d -p 2222:2222 ${dockerImageTag}"
           }
-        } 
+        }
 
         // stage('Push image') {
+          // steps{
+          //   script {
         //     /* Finally, we'll push the image with the 'latest' tag.
         //      Pushing multiple tags is cheap, as all the layers are reused. */
         //     docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-        //         app.push("${env.BUILD_NUMBER}")
-        //         app.push("latest")
+              //  dockerImage.push()
         //     }
+//     }
+// }
         // }
+
+        // stage('Cleaning up') {
+        //   steps{
+        //     sh "docker rmi $registry:$BUILD_NUMBER"
+        //   }
+        // }        
     }
     
     post {
