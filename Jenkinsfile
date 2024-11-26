@@ -52,7 +52,7 @@ pipeline {
 
         stage('Deploy Docker Image'){
           steps {
-            sh "docker run --name demo-jenkins -d -p 2222:2222 ${dockerImageTag}"
+            sh "docker run --name demo-jenkins -d -p 2222:2222 $registry:$BUILD_NUMBER"
           }
         }
 
