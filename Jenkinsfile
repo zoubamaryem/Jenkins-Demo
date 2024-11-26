@@ -1,6 +1,6 @@
 pipeline {
     // agent any
-    agent 'contrôleur'
+    agent default
 
     // tools {
     //     // Install the Maven version configured as "M3" and add it to the path.
