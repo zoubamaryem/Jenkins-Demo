@@ -2,9 +2,9 @@ node {
     def dockerImage
     def dockerImageTag = "wahid007/demo-jenkins${env.BUILD_NUMBER}"
     
-    stage('Clone Repo') {
-      git 'https://github.com/wahid007/Jenkins-Demo.git'
-    }    
+    // stage('Clone Repo') {
+    //   git branch: 'main', url: 'https://github.com/wahid007/Jenkins-Demo.git'
+    // }    
   
     stage('Build Project') {
       sh "mvn -Dmaven.test.failure.ignore=true clean package"
