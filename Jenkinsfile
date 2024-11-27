@@ -46,6 +46,7 @@ pipeline {
           }
         }       
 
+        // Add docker hub credentials in Jenkins : Go to Credentials → Global → Add credentials 
         stage('Push image') {
           steps{
             script {
