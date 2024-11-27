@@ -6,8 +6,8 @@ pipeline {
         // the value of a temporary file.  For example:
         //   /home/user/.jenkins/workspace/cred_test@tmp/secretFiles/546a5cf3-9b56-4165-a0fd-19e2afe6b31f/kubeconfig.txt
         // MY_KUBECONFIG = credentials('my-kubeconfig')
-        registry = "wahid007/demo-jenkins"
-        registryCredential = 'dockerhub_id'
+        registry = "wahidh007/demo-jenkins"
+        registryCredential = 'docker-hub-credentials'
         dockerImage = ''        
     }
 
@@ -46,15 +46,15 @@ pipeline {
           }
         }       
 
-        // stage('Push image') {
-        //   steps{
-        //     script {
-        //       docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-        //         dockerImage.push()
-        //       }
-        //     }
-        //   }
-        // }
+        stage('Push image') {
+          steps{
+            script {
+              docker.withRegistry('https://registry.hub.docker.com', $registryCredential) {
+                dockerImage.push()
+              }
+            }
+          }
+        }
 
         stage('Deploy Docker container'){
           steps {
@@ -63,24 +63,24 @@ pipeline {
           }
         }
 
-        stage('Deploy K8S'){
-          steps {
-            sh "kubectl apply -f k8s.yml"
-          }
-        }
-
-        stage('Verify deployment'){
-          steps {
-            sh "kubectl get pods"
-            sh "kubectl get svc"
-          }
-        }
-
-        // stage('Cleaning up') {
-        //   steps{
-        //     sh "docker rmi $registry:$BUILD_NUMBER"
+        // stage('Deploy K8S'){
+        //   steps {
+        //     sh "kubectl apply -f k8s.yml"
         //   }
-        // }        
+        // }
+
+        // stage('Verify deployment'){
+        //   steps {
+        //     sh "kubectl get pods"
+        //     sh "kubectl get svc"
+        //   }
+        // }
+
+        stage('Cleaning up') {
+          steps{
+            sh "docker rmi $registry:$BUILD_NUMBER"
+          }
+        }        
     }
     
     post {
