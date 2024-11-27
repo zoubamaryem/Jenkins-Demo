@@ -23,20 +23,17 @@ pipeline {
     }
 
     stages {
-        // For Pipeline script
-        // stage('Clone Repo') {
-        //     steps {
-        //         // Get some code from a GitHub repository
-        //         git branch: 'main', url: 'https://github.com/wahid007/Jenkins-Demo.git'
-        //         // git 'https://github.com/wahid007/Jenkins-Demo'
-        //     }
+        stage('Clone Repo') {
+            steps {
+                git branch: 'main', url: 'https://github.com/wahid007/Jenkins-Demo.git'
+                // git 'https://github.com/wahid007/Jenkins-Demo'
+            }
 
-        // }
+        }
         
         stage('Build App') {
             steps {
-                // Run Maven on a Unix agent.
-                sh "mvn -Dmaven.test.failure.ignore=true clean package"
+                sh "mvn clean package"
             }
         }
         
@@ -49,23 +46,35 @@ pipeline {
           }
         }       
 
-        stage('Deploy Docker Image'){
+        // stage('Push image') {
+        //   steps{
+        //     script {
+        //       docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
+        //         dockerImage.push()
+        //       }
+        //     }
+        //   }
+        // }
+
+        stage('Deploy Docker container'){
           steps {
+            // sh "docker stop ${IMAGE_NAME} || true && docker rm $registry:$BUILD_NUMBER || true"
             sh "docker run --name demo-jenkins -d -p 2222:2222 $registry:$BUILD_NUMBER"
           }
         }
 
-        // stage('Push image') {
-          // steps{
-          //   script {
-        //     /* Finally, we'll push the image with the 'latest' tag.
-        //      Pushing multiple tags is cheap, as all the layers are reused. */
-        //     docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-              //  dockerImage.push()
-        //     }
-//     }
-// }
-        // }
+        stage('Deploy K8S'){
+          steps {
+            sh "kubectl apply -f deployment.yaml"
+          }
+        }
+
+        stage('Verify deployment'){
+          steps {
+            sh "kubectl get pods"
+            sh "kubectl get svc"
+          }
+        }
 
         // stage('Cleaning up') {
         //   steps{
