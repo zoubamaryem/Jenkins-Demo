@@ -62,7 +62,7 @@ pipeline {
           steps {
             // sh "docker stop ${IMAGE_NAME} || true && docker rm $registry:$BUILD_NUMBER || true"
             sh "docker run --name demo-jenkins -d -p 2222:2222 $registry:$BUILD_NUMBER"
-            slackSend color: "good", message: registry + ":$BUILD_NUMBER" - "image successfully created!"
+            slackSend color: "good", message: registry + ":$BUILD_NUMBER" + " - image successfully created!"
           }
         }
 
