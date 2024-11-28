@@ -46,22 +46,23 @@ pipeline {
           }
         }       
 
-        // Add docker hub credentials in Jenkins : Go to Credentials → Global → Add credentials 
-        stage('Push image') {
-          steps{
-            script {
-              // docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
-              docker.withRegistry('', registryCredential ) {
-                dockerImage.push()
-              }
-            }
-          }
-        }
+        // // Add docker hub credentials in Jenkins : Go to Credentials → Global → Add credentials 
+        // stage('Push image') {
+        //   steps{
+        //     script {
+        //       // docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
+        //       docker.withRegistry('', registryCredential ) {
+        //         dockerImage.push()
+        //       }
+        //     }
+        //   }
+        // }
 
         stage('Deploy Docker container'){
           steps {
             // sh "docker stop ${IMAGE_NAME} || true && docker rm $registry:$BUILD_NUMBER || true"
             sh "docker run --name demo-jenkins -d -p 2222:2222 $registry:$BUILD_NUMBER"
+            slackSend color: "good", message: "Message from Jenkins Pipeline"
           }
         }
 
