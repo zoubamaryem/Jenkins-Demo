@@ -89,9 +89,11 @@ pipeline {
     post {
         success {
             echo 'Pipeline execution successful!'
+            slackSend color: "good", message: "Pipeline execution successful! :man_dancing:"
         }
         failure {
             echo 'Pipeline execution failed.'
+            slackSend color: "danger", message: "Pipeline execution failed! :ghost:"
         }
     }    
 }
