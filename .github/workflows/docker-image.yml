@@ -1,0 +1,75 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: [self-hosted, ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag demo-jenkins:$(date +%s)
+
+    # - name: Set up Docker Buildx
+    #   uses: docker/setup-buildx-action@v2
+
+    # - name: Log in to Docker Hub
+    #   uses: docker/login-action@v2
+    #   with:
+    #     username: ${{ secrets.DOCKER_USERNAME }}  # Store Docker Hub credentials in GitHub secrets
+    #     password: ${{ secrets.DOCKER_PASSWORD }}
+
+    # - name: Build Docker image
+    #   run: |
+    #     docker build -t myapp:latest .
+
+    # - name: Push Docker image to Docker Hub
+    #   run: |
+    #     docker tag myapp:latest myusername/myapp:latest  # Change to your Docker Hub repo
+    #     docker push myusername/myapp:latest
+
+    # - name: Run Docker container locally (for testing)
+    #   run: |
+    #     # Run the Docker container on your local runner
+    #     docker run -d --name myapp-container -p 8080:8080 myusername/myapp:latest
+
+    # - name: Verify the container is running (local test)
+    #   run: |
+    #     docker ps  # This will show all running containers
+
+    # - name: Set up Kubernetes (kubectl)
+    #   run: |
+    #     # Assuming you're using Minikube or any local Kubernetes setup
+    #     # Ensure kubectl is installed
+    #     curl -LO "https://dl.k8s.io/release/v1.26.0/bin/linux/amd64/kubectl"
+    #     chmod +x ./kubectl
+    #     sudo mv ./kubectl /usr/local/bin/kubectl
+    #     kubectl version --client  # Verify kubectl installation
+
+    #     # Assuming you're using Minikube, you may need to start your Minikube cluster
+    #     minikube start
+
+    #     # Set up kubeconfig to connect to your local Kubernetes cluster
+    #     kubectl config use-context minikube
+
+    # - name: Deploy to Kubernetes
+    #   run: |
+    #     # Create a Kubernetes Deployment YAML file
+    #     kubectl apply -f k8s/deployment.yaml
+
+    # - name: Verify Kubernetes Deployment
+    #   run: |
+    #     kubectl get pods  # Ensure your pod is running
+    #     kubectl get svc   # Ensure the service is exposing the app properly
+
+    # - name: Clean up Docker container (local test)
+    #   run: |
+    #     docker stop myapp-container
+    #     docker rm myapp-container
