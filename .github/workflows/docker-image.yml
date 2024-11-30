@@ -19,7 +19,7 @@ jobs:
       run: mvn clean package
     
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag demo-jenkins:$(date +%s)
+      run: docker build . --file Dockerfile --tag demo-jenkins:${{github.run_number}}
 
     # - name: Set up Docker Buildx
     #   uses: docker/setup-buildx-action@v2
@@ -42,7 +42,7 @@ jobs:
     - name: Run Docker container locally (for testing)
       run: |
         # Run the Docker container on your local runner
-        docker run --name demo-jenkins-github -d -p 2222:2222 demo-jenkins:$(date +%s)
+        docker run --name demo-jenkins-github -d -p 2222:2222 demo-jenkins:${{github.run_number}}
 
     # - name: Verify the container is running (local test)
     #   run: |
