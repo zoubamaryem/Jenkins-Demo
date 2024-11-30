@@ -39,10 +39,10 @@ jobs:
     #     docker tag myapp:latest myusername/myapp:latest  # Change to your Docker Hub repo
     #     docker push myusername/myapp:latest
 
-    # - name: Run Docker container locally (for testing)
-    #   run: |
-    #     # Run the Docker container on your local runner
-    #     docker run -d --name myapp-container -p 8080:8080 myusername/myapp:latest
+    - name: Run Docker container locally (for testing)
+      run: |
+        # Run the Docker container on your local runner
+        docker run --name demo-jenkins-github -d -p 2222:2222 demo-jenkins:$(date +%s)
 
     # - name: Verify the container is running (local test)
     #   run: |
