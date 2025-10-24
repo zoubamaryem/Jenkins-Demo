@@ -1,99 +1,72 @@
-pipeline {
-    agent any
-
-    environment {
-        // The MY_KUBECONFIG environment variable will be assigned
-        // the value of a temporary file.  For example:
-        //   /home/user/.jenkins/workspace/cred_test@tmp/secretFiles/546a5cf3-9b56-4165-a0fd-19e2afe6b31f/kubeconfig.txt
-        // MY_KUBECONFIG = credentials('my-kubeconfig')
-        registry = "wahidh007/demo-jenkins"
-        registryCredential = 'docker-hub-credentials'
-        dockerImage = ''        
-    }
-
-
-    // tools {
-    //     // Install the Maven version configured as "M3" and add it to the path.
-    //     maven "M3"
-    // }
-
-    // Poll every 5 minutes, if there is a new code Jenkins will run the job
-    triggers {
-        pollSCM('*/5 * * * *')
-    }
-
-    stages {
-        stage('Clone Repo') {
-            steps {
-                git branch: 'main', url: 'https://github.com/wahid007/Jenkins-Demo.git'
-                // git 'https://github.com/wahid007/Jenkins-Demo'
-            }
-
-        }
-        
-        stage('Build App') {
-            steps {
-                sh "mvn clean package"
-            }
-        }
-        
-        stage('Build image') {
-          steps{
-              // sh "docker build -t $registry:$BUILD_NUMBER ."
-              script {
-                dockerImage = docker.build registry + ":$BUILD_NUMBER"   
-              }          
-          }
-        }       
-
-        // // Add docker hub credentials in Jenkins : Go to Credentials → Global → Add credentials 
-        // stage('Push image') {
-        //   steps{
-        //     script {
-        //       // docker.withRegistry('https://registry.hub.docker.com', registryCredential) {
-        //       docker.withRegistry('', registryCredential ) {
-        //         dockerImage.push()
-        //       }
-        //     }
-        //   }
-        // }
-
-        stage('Deploy Docker container'){
-          steps {
-            // sh "docker stop ${IMAGE_NAME} || true && docker rm $registry:$BUILD_NUMBER || true"
-            sh "docker run --name demo-jenkins -d -p 2222:2222 $registry:$BUILD_NUMBER"
-            slackSend color: "good", message: registry + ":$BUILD_NUMBER" + " - image successfully created! :man_dancing:"
-          }
-        }
-
-        // stage('Deploy K8S'){
-        //   steps {
-        //     sh "kubectl apply -f k8s.yml"
-        //   }
-        // }
-
-        // stage('Verify deployment'){
-        //   steps {
-        //     sh "kubectl get pods"
-        //     sh "kubectl get svc"
-        //   }
-        // }
-
-        // stage('Cleaning up') {
-        //   steps{
-        //     sh "docker rmi $registry:$BUILD_NUMBER"
-        //   }
-        // }        
+node {
+    def mvnHome = tool 'maven-3.9.9'
+    def dockerImage
+    def dockerImageTag = "devopsexample:${env.BUILD_NUMBER}"
+    
+    stage('Clone Repo') {
+        git branch: 'main', url: 'https://github.com/zoubamaryem/Jenkins-Demo.git'
     }
     
-    post {
-        success {
-            echo 'Pipeline execution successful!'
-            slackSend color: "good", message: "Pipeline execution successful! :man_dancing:"
-        }
-        failure {
-            echo 'Pipeline execution failed.'
-            slackSend color: "danger", message: "Pipeline execution failed! :ghost:"
-        }
-    }    
+    stage('Build Project') {
+        sh "${mvnHome}/bin/mvn clean package"
+    }
+    
+    stage('Initialize Docker'){
+        def dockerHome = tool 'MyDocker'
+        env.PATH = "${dockerHome}/bin:${env.PATH}"
+    }
+    
+    stage('Build Docker Image') {
+        sh "docker -H tcp://192.168.100.34:2375 build -t ${dockerImageTag} ."
+    }
+    
+    stage('Deploy Docker Image'){
+        echo "Docker Image Tag Name: ${dockerImageTag}"
+        sh "docker -H tcp://192.168.100.34:2375 run --name devopsexample-${env.BUILD_NUMBER} -d -p 2222:2222 ${dockerImageTag}"
+    }
 }
+```
+
+5. **Cliquez sur "Commit changes"** (en haut à droite)
+
+6. Dans la popup, cliquez sur **"Commit changes"** pour confirmer
+
+---
+
+# 🚀 **ÉTAPE 15 : CRÉER LE PIPELINE DANS JENKINS**
+
+Maintenant, retournez sur Jenkins.
+
+## 15.1 Créer le Pipeline
+
+1. Allez sur le Dashboard Jenkins : `http://192.168.100.34:8080/`
+2. Cliquez sur **"Nouveau Item"** ou **"New Item"** (menu gauche)
+
+3. **Remplissez :**
+   - **Nom** : `Jenkins-Demo-Pipeline`
+   - **Type** : Sélectionnez **"Pipeline"**
+   - Cliquez sur **"OK"**
+
+---
+
+## 15.2 Configuration du Pipeline
+
+### **Section "General"**
+
+1. ✅ Cochez **"GitHub project"**
+2. **Project url** : 
+```
+   https://github.com/zoubamaryem/Jenkins-Demo/
+```
+
+### **Section "Pipeline"**
+
+Descendez jusqu'à la section **"Pipeline"** :
+
+1. **Definition** : Sélectionnez **"Pipeline script from SCM"**
+
+2. **SCM** : Sélectionnez **"Git"**
+
+3. **Repository URL** :
+```
+   https://github.com/zoubamaryem/Jenkins-Demo.git
